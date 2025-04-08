@@ -1,0 +1,248 @@
+{% extends 'base.html'  %}
+{% load static %}
+{% block title %}Products{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb Start -->
+<div class="breadcrumb-wrap">
+    <div class="container">
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item"><a href="#">Products</a></li>
+            <li class="breadcrumb-item active">product list</li>
+        </ul>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+
+
+<!-- Product List Start -->
+<div class="product-view">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="product-search">
+                                    <input type="email" value="Search">
+                                    <button><i class="fa fa-search"></i></button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="product-short">
+                                    <div class="dropdown">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Product short by</a>
+                                        <div class="dropdown-menu dropdown-menu-right">
+                                            <a href="#" class="dropdown-item">Newest</a>
+                                            <a href="#" class="dropdown-item">Popular</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {%for product in page_obj%}
+
+                    <div class="col-lg-4">
+                        <div class="product-item">
+                            <div class="product-image">
+                                <a href="{% url 'shopping:product_detail' product.id %}">
+                                    <img src="{{product.image.url}}" alt="Product Image">
+                                </a>
+                                <div class="product-action">
+
+                                    <a href="#" class="add-to-cart" data-id="{{ product.id }}" ><i class="fa fa-cart-plus"></i></a>
+                                    <a href="#" class="add-to-wishlist" data-id="{{ product.id }}"><i class="fa fa-heart"></i></a>
+                                    <a href="{% url 'shopping:product_detail' product.id %}"><i class="fa fa-search"></i></a>
+                                </div>
+                            </div>
+                            <div class="product-content">
+                                <div class="title"><a href="#">{{ product.product_name }}</a></div>
+                                <div class="ratting">
+                                    {%for i in '12345'%}
+                                        {%if forloop.counter <= product.score %}
+                                            <i class="fa fa-star"></i>
+                                        {% else %}
+                                            <i class="fa fa-star-o"></i>
+                                        {% endif %}
+                                    {%endfor%}
+                                </div>
+                                {% if product.ex_price %}
+                                <div class="price">{{product.price}} <span>{{product.ex_price}}</span></div>
+                                {% else %}
+                                <div class="price">{{product.price}}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {%endfor%}
+
+                </div>
+
+                <div class="col-lg-12">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                                </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+
+
+            </div>
+
+
+            <div class="col-md-3">
+                {% include '__categories.html' %}
+
+                <div class="sidebar-widget image">
+                    <h2 class="title">Featured Product</h2>
+                    {% if featured_product %}
+                    <a href="{% url 'shopping:product_detail' featured_product.id %}">
+                        <img src="{{ featured_product.image.url }}" alt="Image">
+                    </a>
+                    {% else %}
+                     <a href="{% url 'shopping:product_detail' featured_product.id %}">
+                        <img src="{% static 'base/img/category-1.jpg' %}" alt="Image">
+                    </a>
+                    {% endif %}
+                </div>
+
+                <div class="sidebar-widget brands">
+                    <h2 class="title">Our Brands</h2>
+                    <ul>
+                        {% for brand in brands %}
+                            <li><a href="#">{{brand.name}}</a><span>(exist)</span></li>
+                        {% empty %}
+                            <li>No brands available.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="sidebar-widget tag">
+                    <h2 class="title">Tags Cloud</h2>
+                    <a href="#">Lorem ipsum</a>
+                    <a href="#">Vivamus</a>
+                    <a href="#">Phasellus</a>
+                    <a href="#">pulvinar</a>
+                    <a href="#">Curabitur</a>
+                    <a href="#">Fusce</a>
+                    <a href="#">Sem quis</a>
+                    <a href="#">Mollis metus</a>
+                    <a href="#">Sit amet</a>
+                    <a href="#">Vel posuere</a>
+                    <a href="#">orci luctus</a>
+                    <a href="#">Nam lorem</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Product List End -->
+
+
+<!--Page navigator-->
+<script>
+    $(document).ready(function(){
+        $(".pagination a").on("click", function(e){
+            e.preventDefault();
+            var page_url = $(this).attr("href");
+
+            $.get(page_url, function(data){
+                $(".row").html($(data).find(".row").html());
+                $(".pagination").html($(data).find(".pagination").html());
+            });
+        });
+    });
+</script>
+
+<script src="https://code.jquery.com/jquery-3.7.1.slim.js" integrity="sha256-UgvvN8vBkgO0luPSUl2s8TIlOSYRoGFAX4jlCIm9Adc=" crossorigin="anonymous"></script>
+
+
+
+<!--Add-to-cart start-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    $('.add-to-cart').click(function(e){
+        e.preventDefault();
+        var productId = $(this).data('id');
+        // Əgər miqdar seçimi varsa, onu da əlavə edə bilərsiniz
+        var quantity = 1;
+        $.ajax({
+            type: "POST",
+            url: "{% url 'shopping:add_to_cart' %}",
+            data: {
+                'product_id': productId,
+                'quantity': quantity,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response){
+                if(response.status == 'ok'){
+                    alert(response.message);
+                    // Məsələn, yuxarı headerdə cart sayını yeniləyə bilərsiniz.
+                } else {
+                    alert("Xəta baş verdi.");
+                }
+            },
+            error: function(){
+                alert("Serverlə əlaqə qurulmadı.");
+            }
+        });
+    });
+});
+</script>
+<!--Add-to-cart end-->
+
+<!--Add-to-wishlist start-->
+<script>
+$(document).ready(function(){
+    // Add to Wishlist AJAX funksiyası
+    $('.add-to-wishlist').click(function(e){
+        e.preventDefault();
+        var productId = $(this).data('id');
+        var quantity = 1; // Əgər miqdar seçimi varsa bunu dəyişə bilərsiniz
+        $.ajax({
+            type: "POST",
+            url: "{% url 'shopping:add_to_wishlist' %}",
+            data: {
+                'product_id': productId,
+                'quantity': quantity,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response){
+                if(response.status == 'ok'){
+                    alert(response.message);
+                    // Ümumi wishlist məhsul sayını yeniləyə bilərsiniz (məsələn, headerdə göstərmək üçün)
+                } else {
+                    alert("Xəta baş verdi.");
+                }
+            },
+            error: function(){
+                alert("Serverlə əlaqə qurulmadı.");
+            }
+        });
+    });
+});
+</script>
+<!--Add-to-wishlist end-->
+
+{% endblock %}

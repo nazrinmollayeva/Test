@@ -1,0 +1,342 @@
+{% extends 'base.html'  %}
+{% load static %}
+{% block title %}Products-detail{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb Start -->
+<div class="breadcrumb-wrap">
+    <div class="container">
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item"><a href="#">Products</a></li>
+            <li class="breadcrumb-item active">Product details</li>
+        </ul>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+
+<!-- Product Detail Start -->
+<div class="product-detail">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-9">
+                <div class="row align-items-center product-detail-top">
+                    <div class="col-md-5">
+                        <div class="product-slider-single">
+                            <img src="{{ product.image.url }}" alt="Product Image">
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="product-content">
+                            <div class="title"><h2>{{ product.product_name }}</h2></div>
+                                <div class="ratting">
+                                    {%for i in '12345'%}
+                                        {%if forloop.counter <= product.score %}
+                                            <i class="fa fa-star"></i>
+                                        {% else %}
+                                            <i class="fa fa-star-o"></i>
+                                        {% endif %}
+                                    {%endfor%}
+                                </div>
+
+                            {% if product.ex_price %}
+                            <div class="price">{{product.price}} <span>{{product.ex_price}}</span></div>
+                            {% else %}
+                            <div class="price">{{product.price}}</div>
+                            {% endif %}
+
+                            <div class="details">
+                                <p>
+                                    {{ product.details }}
+                                </p>
+                            </div>
+
+                            <div class="quantity">
+                                <h4>Quantity:</h4>
+                                <div class="qty">
+                                    <button class="btn-minus"><i class="fa fa-minus"></i></button>
+                                    <input type="text" value="1">
+                                    <button class="btn-plus"><i class="fa fa-plus"></i></button>
+                                </div>
+                            </div>
+                            <div class="action">
+                                <a href="#" class="add-to-cart" data-id="{{ product.id }}"><i class="fa fa-cart-plus"></i></a>
+                                <a href="#" class="add-to-wishlist" data-id="{{ product.id }}"><i class="fa fa-heart"></i></a>
+                                <a href="{% url 'shopping:product_detail' product.id %}"><i class="fa fa-search"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row product-detail-bottom">
+                    <div class="col-lg-12">
+                        <ul class="nav nav-pills nav-justified">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="pill" href="#description">Description</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="pill" href="#specification">Specification</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="pill" href="#reviews">Reviews ({{ reviews.count }})</a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div id="description" class="container tab-pane active"><br>
+                                <h4>Product description</h4>
+                                <p>
+                                    {{ product.description }}
+                                </p>
+                            </div>
+                            <div id="specification" class="container tab-pane fade"><br>
+                                <h4>Product specification</h4>
+                                 <p>
+                                    {{ product.specification }}
+                                </p>
+                            </div>
+                            <div id="reviews" class="container tab-pane fade"><br>
+                                {% if reviews %}
+                                    {% for review in reviews %}
+                                        <div class="reviews-submitted">
+                                            <div class="reviewer">
+                                                {{ review.reviewer_name }} - <span>{{ review.created_at|date:"d M Y" }}</span>
+                                            </div>
+                                            <div class="ratting">
+                                                {% for i in "12345" %}
+                                                    {% if forloop.counter <= review.rating %}
+                                                        <i class="fa fa-star"></i>
+                                                    {% else %}
+                                                        <i class="fa fa-star-o"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                            <p>{{ review.content }}</p>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <p>No reviews yet.</p>
+                                {% endif %}
+
+                                {% if user.is_authenticated %}
+                                    <div class="reviews-submit">
+                                        <h4>Give your Review:</h4>
+                                        <!-- Ulduz seçimi üçün interaktiv div -->
+                                        <div class="ratting" id="star-rating">
+                                            <i class="fa fa-star-o" data-score="1"></i>
+                                            <i class="fa fa-star-o" data-score="2"></i>
+                                            <i class="fa fa-star-o" data-score="3"></i>
+                                            <i class="fa fa-star-o" data-score="4"></i>
+                                            <i class="fa fa-star-o" data-score="5"></i>
+                                        </div>
+                                        <form method="POST" action="{% url 'shopping:product_detail' product.id %}">
+                                            {% csrf_token %}
+                                            <div class="row form">
+                                                <div class="col-sm-6">
+                                                    <input type="text" name="reviewer_name" placeholder="Name" class="form-control" value="{{ review_form.reviewer_name.value|default:'' }}">
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <input type="email" name="reviewer_email" placeholder="Email" class="form-control" value="{{ review_form.reviewer_email.value|default:'' }}">
+                                                </div>
+                                                <div class="col-sm-12">
+                                                    <textarea name="content" placeholder="Review" class="form-control" rows="2">{{ review_form.content.value|default:'' }}</textarea>
+                                                </div>
+                                                <div class="col-sm-12">
+                                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                                </div>
+                                            </div>
+                                            <!-- Gizli input rating üçün, ulduz seçimi ilə yenilənəcək -->
+                                            <input type="hidden" name="rating" id="id_rating" value="{{ review_form.rating.value|default:'0' }}">
+                                        </form>
+                                    </div>
+                                {% else %}
+                                    <p>Please <a href="{% url 'shopping:login' %}">login</a> to submit a review.</p>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container">
+                    <div class="section-header">
+                        <h3>Related Products</h3>
+                        <p>
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec viverra at massa sit amet ultricies. Nullam consequat, mauris non interdum cursus
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row align-items-center product-slider product-slider-3">
+                    {% for product in products %}
+                    <div class="col-lg-3">
+                        <div class="product-item">
+                            <div class="product-image">
+                                <a href="product-detail.html">
+                                    <img src="{{ product.image.url }}" alt="Product Image">
+                                </a>
+                                <div class="product-action">
+                                    <a href="#"><i class="fa fa-cart-plus"></i></a>
+                                    <a href="#"><i class="fa fa-heart"></i></a>
+                                    <a href="#"><i class="fa fa-search"></i></a>
+                                </div>
+                            </div>
+                            <div class="product-content">
+                                <div class="title"><a href="#">Phasellus Gravida</a></div>
+                                <div class="ratting">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="price">$22 <span>$25</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-lg-3">
+                {% include '__categories.html' %}
+
+
+                <div class="sidebar-widget image">
+                    <h2 class="title">Featured Product</h2>
+                    {% if featured_product %}
+                    <a href="{% url 'shopping:product_detail' featured_product.id %}">
+                        <img src="{{ featured_product.image.url }}" alt="Image">
+                    </a>
+                    {% else %}
+                     <a href="{% url 'shopping:product_detail' featured_product.id %}">
+                        <img src="{% static 'base/img/category-1.jpg' %}" alt="Image">
+                    </a>
+                    {% endif %}
+                </div>
+
+                <div class="sidebar-widget brands">
+                    <h2 class="title">Our Brands</h2>
+                    <ul>
+                        {% for brand in brands %}
+                            <li><a href="#">{{brand.name}}</a><span>(exist)</span></li>
+                        {% empty %}
+                            <li>No brands available.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="sidebar-widget tag">
+                    <h2 class="title">Tags Cloud</h2>
+                    <a href="#">Lorem ipsum</a>
+                    <a href="#">Vivamus</a>
+                    <a href="#">Phasellus</a>
+                    <a href="#">pulvinar</a>
+                    <a href="#">Curabitur</a>
+                    <a href="#">Fusce</a>
+                    <a href="#">Sem quis</a>
+                    <a href="#">Mollis metus</a>
+                    <a href="#">Sit amet</a>
+                    <a href="#">Vel posuere</a>
+                    <a href="#">orci luctus</a>
+                    <a href="#">Nam lorem</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Product Detail End -->
+
+
+
+<!--add to cart and wishlist-->
+<!-- jQuery-nin yükləndiyinə əmin olun -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<!--Review-de Ulduz secimi ucun funksiya-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $('#star-rating i').on('click', function(){
+            var score = $(this).data('score');
+            // Gizli inputa seçilən dəyəri yazırıq
+            $('#id_rating').val(score);
+            // Bütün ulduzları boş vəziyyətə gətiririk
+            $('#star-rating i').removeClass('fa-star').addClass('fa-star-o');
+            // Seçilmiş sayda ulduzları dolu edirik
+            $('#star-rating i').each(function(){
+                if($(this).data('score') <= score){
+                    $(this).removeClass('fa-star-o').addClass('fa-star');
+                }
+            });
+        });
+    });
+</script>
+
+
+<!-- Add-to-cart funksiyası -->
+<script>
+$(document).ready(function(){
+    $('.add-to-cart').click(function(e){
+        e.preventDefault();
+        var productId = $(this).data('id');
+        var quantity = 1; // Əgər məhsul detallı səhifəsində miqdar seçimi varsa onu da əlavə edin
+        $.ajax({
+            type: "POST",
+            url: "{% url 'shopping:add_to_cart' %}",
+            data: {
+                'product_id': productId,
+                'quantity': quantity,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response){
+                if(response.status == 'ok'){
+                    // Əgər sebetə əlavə olunduqdan sonra sebet səhifəsinə yönləndirmək istəyirsinizsə:
+                    window.location.href = "{% url 'shopping:cart' %}";
+                } else {
+                    alert("Xəta baş verdi.");
+                }
+            },
+            error: function(){
+                alert("Serverlə əlaqə qurulmadı.");
+            }
+        });
+    });
+});
+</script>
+
+<!-- Add-to-wishlist funksiyası -->
+<script>
+$(document).ready(function(){
+    $('.add-to-wishlist').click(function(e){
+        e.preventDefault();
+        var productId = $(this).data('id');
+        var quantity = 1;
+        $.ajax({
+            type: "POST",
+            url: "{% url 'shopping:add_to_wishlist' %}",
+            data: {
+                'product_id': productId,
+                'quantity': quantity,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response){
+                if(response.status == 'ok'){
+                    alert(response.message);
+                    // Eyni şəkildə, əgər wishlist səhifəsinə yönləndirmək istəyirsinizsə:
+                    // window.location.href = "{% url 'shopping:wishlist' %}";
+                } else {
+                    alert("Xəta baş verdi.");
+                }
+            },
+            error: function(){
+                alert("Serverlə əlaqə qurulmadı.");
+            }
+        });
+    });
+});
+</script>
+
+
+{% endblock %}

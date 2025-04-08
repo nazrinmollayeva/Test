@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Wishlist{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb Start -->
+<div class="breadcrumb-wrap">
+    <div class="container">
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item"><a href="#">Products</a></li>
+            <li class="breadcrumb-item active">Wishlist</li>
+        </ul>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+
+<!-- Wishlist Start -->
+<div class="cart-page">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Add to Cart</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody class="align-middle">
+                            {% for item in wishlist.items.all %}
+                            <tr data-item-id="{{ item.id }}">
+                                <td><a href="#"><img src="{{ item.product.image.url }}" alt="Image"></a></td>
+                                <td><a href="#">{{ item.product.product_name }}</a></td>
+                                <td>{{ item.product.price }}</td>
+                                <td>
+                                    <div class="qty">
+                                        <button class="wishlist-btn-minus"><i class="fa fa-minus"></i></button>
+                                        <input type="text" value="{{ item.quantity }}">
+                                        <button class="wishlist-btn-plus"><i class="fa fa-plus"></i></button>
+                                    </div>
+                                </td>
+                                <td><button class="move-to-cart">Add to Cart</button></td>
+                                <td><button class="remove-wishlist-item"><i class="fa fa-trash"></i></button></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Wishlist End -->
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    // Miqdar artırmaq
+    $('.wishlist-btn-plus').click(function(e){
+        e.preventDefault();
+        var $row = $(this).closest('tr');
+        var itemId = $row.data('item-id');
+        $.ajax({
+            type: "POST",
+            url: "{% url 'shopping:update_wishlist_item' %}",
+            data: {
+                'item_id': itemId,
+                'action': 'increment',
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response){
+                if(response.status == 'ok'){
+                    $row.find('input').val(response.quantity);
+                    // Ümumi wishlist element sayını da yeniləyə bilərsiniz
+                }
+            }
+        });
+    });
+
+    // Miqdar azaltmaq
+    $('.wishlist-btn-minus').click(function(e){
+        e.preventDefault();
+        var $row = $(this).closest('tr');
+        var itemId = $row.data('item-id');
+        $.ajax({
+            type: "POST",
+            url: "{% url 'shopping:update_wishlist_item' %}",
+            data: {
+                'item_id': itemId,
+                'action': 'decrement',
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response){
+                if(response.status == 'ok'){
+                    $row.find('input').val(response.quantity);
+                }
+            }
+        });
+    });
+
+    // Məhsulu silmək
+    $('.remove-wishlist-item').click(function(e){
+        e.preventDefault();
+        var $row = $(this).closest('tr');
+        var itemId = $row.data('item-id');
+        $.ajax({
+            type: "POST",
+            url: "{% url 'shopping:remove_wishlist_item' %}",
+            data: {
+                'item_id': itemId,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response){
+                if(response.status == 'ok'){
+                    $row.remove();
+                    // Ümumi siyahı sayını yenidən hesablaya bilərsiniz
+                }
+            }
+        });
+    });
+
+    // "Move to Cart" düyməsi üçün (əlavə funksiya):
+    $('.move-to-cart').click(function(e){
+        e.preventDefault();
+        var $row = $(this).closest('tr');
+        var itemId = $row.data('item-id');
+        // Burada AJAX ilə əvvəlcə həmin wishlist elementini silib,
+        // sonra cart-ə əlavə etmə əməliyyatı yerinə yetirə bilərsiniz.
+        // Bu, mövcud add_to_cart funksiyasını istifadə edərək edilə bilər.
+    });
+});
+</script>
+
+<!--Add to cart from wishlist-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    // "Move to Cart" düyməsinin klik eventini işləyirik
+    $('.move-to-cart').click(function(e){
+        e.preventDefault();
+        var $row = $(this).closest('tr');
+        var itemId = $row.data('item-id');
+        $.ajax({
+            type: "POST",
+            url: "{% url 'shopping:move_to_cart' %}",
+            data: {
+                'item_id': itemId,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response){
+                if(response.status == 'ok'){
+                    // Əgər istəyirsinizsə, cart səhifəsinə yönləndirin:
+                    window.location.href = "{% url 'shopping:cart' %}";
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(){
+                alert("Serverlə əlaqə qurulmadı.");
+            }
+        });
+    });
+});
+</script>
+
+
+
+{% endblock %}

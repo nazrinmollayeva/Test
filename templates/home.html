@@ -1,0 +1,307 @@
+{% extends 'base.html'  %}
+
+{% load static %}
+
+{% block title %}Home{% endblock %}
+
+{%block content%}
+<!-- Main Slider Start -->
+<div class="home-slider">
+    <div class="main-slider">
+        {% for slider in sliders %}
+        <div class="main-slider-item"><img src="{{slider.slider.url}}" alt="Slider Image" /></div>
+        {% endfor %}
+    </div>
+</div>
+<!-- Main Slider End -->
+
+
+<!-- Feature Start-->
+<div class="feature">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-3 col-md-6 feature-col">
+                <div class="feature-content">
+                    <i class="fa fa-shield"></i>
+                    <h2>Trusted Shopping</h2>
+                    <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 feature-col">
+                <div class="feature-content">
+                    <i class="fa fa-shopping-bag"></i>
+                    <h2>Quality Product</h2>
+                    <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 feature-col">
+                <div class="feature-content">
+                    <i class="fa fa-truck"></i>
+                    <h2>Worldwide Delivery</h2>
+                    <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 feature-col">
+                <div class="feature-content">
+                    <i class="fa fa-phone"></i>
+                    <h2>Telephone Support</h2>
+                    <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Feature End-->
+
+
+<!-- Category Start-->
+<div class="category">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="category-img">
+                    <img src="{% static 'base/img/category-1.jpg' %}" />
+                    <a class="category-name" href="">
+                        <h2>Category Name</h2>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="category-img">
+                    <img src="{% static 'base/img/category-3.jpg' %}" />
+                    <a class="category-name" href="">
+                        <h2>Category Name</h2>
+                    </a>
+                </div>
+                <div class="category-img">
+                    <img src="{% static 'base/img/category-4.jpg' %}" />
+                    <a class="category-name" href="">
+                        <h2>Category Name</h2>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="category-img">
+                    <img src="{% static 'base/img/category-2.jpg' %}" />
+                    <a class="category-name" href="">
+                        <h2>Category Name</h2>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Category End-->
+
+
+<!-- Featured Product Start -->
+<div class="featured-product">
+    <div class="container">
+        <div class="section-header">
+            <h3>Featured Product</h3>
+            <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec viverra at massa sit amet ultricies. Nullam consequat, mauris non interdum cursus
+            </p>
+        </div>
+        <div class="row align-items-center product-slider product-slider-4">
+            {%for featured_product in featured_products%}
+            <div class="col-lg-3">
+                <div class="product-item">
+                    <div class="product-image">
+                        <a href="{% url 'shopping:product_detail' featured_product.id %}">
+                            <img src="{{featured_product.image.url}}" alt="Product Image">
+                        </a>
+                        <div class="product-action">
+                            <a href="#" class="add-to-cart" data-id="{{ featured_product.id }}"><i class="fa fa-cart-plus"></i></a>
+                            <a href="#" class="add-to-wishlist" data-id="{{ featured_product.id }}"><i class="fa fa-heart"></i></a>
+                            <a href="#"><i class="fa fa-search"></i></a>
+                        </div>
+                    </div>
+                    <div class="product-content">
+                        <div class="title"><a href="{% url 'shopping:product_detail' featured_product.id %}">{{featured_product.product_name}}</a></div>
+                        <div class="ratting">
+                            {%for i in '12345'%}
+                                {%if forloop.counter <= featured_product.score %}
+                                    <i class="fa fa-star"></i>
+                                {% else %}
+                                    <i class="fa fa-star-o"></i>
+                                {% endif %}
+                            {%endfor%}
+                        </div>
+                        {% if featured_product.ex_price %}
+                        <div class="price">{{featured_product.price}} <span>{{featured_product.ex_price}}</span></div>
+                        {% else %}
+                        <div class="price">{{featured_product.price}}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</div>
+<!-- Featured Product End -->
+
+
+<!-- Newsletter Start -->
+<div class="newsletter">
+    <div class="container">
+        <div class="section-header">
+            <h3>Subscribe Our Newsletter</h3>
+            <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec viverra at massa sit amet ultricies. Nullam consequat, mauris non interdum cursus.
+            </p>
+        </div>
+        <div class="form">
+            {% if subscriber_exists %}
+                <h3 style="color:#fff"><strong>You are subscriber! </strong></h3>
+            {% else %}
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    {{ subscribe_form.email }}
+                    <button type="submit">Submit</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<!-- Newsletter End -->
+
+
+
+<!-- Recent Product Start -->
+<div class="recent-product">
+    <div class="container">
+        <div class="section-header">
+            <h3>Recent Product</h3>
+            <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec viverra at massa sit amet ultricies. Nullam consequat, mauris non interdum cursus
+            </p>
+        </div>
+        <div class="row align-items-center product-slider product-slider-4">
+            {% for recent_product in recent_products %}
+            <div class="col-lg-3">
+                <div class="product-item">
+                    <div class="product-image">
+                        <a href="{% url 'shopping:product_detail' recent_product.id %}">
+                            <img src="{{ recent_product.image.url }}" alt="Product Image">
+                        </a>
+                        <div class="product-action">
+                            <a href="#" class="add-to-cart" data-id="{{ recent_product.id }}"><i class="fa fa-cart-plus"></i></a>
+                            <a href="#" class="add-to-wishlist" data-id="{{ recent_product.id }}"><i class="fa fa-heart"></i></a>
+                            <a href="#"><i class="fa fa-search"></i></a>
+                        </div>
+                    </div>
+                    <div class="product-content">
+                        <div class="title"><a href="{% url 'shopping:product_detail' recent_product.id %}">{{ recent_product.product_name }}</a></div>
+                        <div class="ratting">
+                            {%for i in '12345'%}
+                                {%if forloop.counter <= recent_product.score %}
+                                    <i class="fa fa-star"></i>
+                                {% else %}
+                                    <i class="fa fa-star-o"></i>
+                                {% endif %}
+                            {%endfor%}
+                        </div>
+                        {% if recent_product.ex_price %}
+                        <div class="price">{{recent_product.price}} <span>{{recent_product.ex_price}}</span></div>
+                        {% else %}
+                        <div class="price">{{recent_product.price}}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<!-- Recent Product End -->
+
+
+<!-- Brand Start -->
+<div class="brand">
+    <div class="container">
+        <div class="section-header">
+            <h3>Our Brands</h3>
+            <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec viverra at massa sit amet ultricies. Nullam consequat, mauris non interdum cursus
+            </p>
+        </div>
+        <div class="brand-slider">
+            {% for brand in brands %}
+            <div class="brand-item"><img src="{{ brand.image.url }}" alt=""></div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<!-- Brand End -->
+
+
+<!-- Add-to-cart start -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    $('.add-to-cart').click(function(e){
+        e.preventDefault();
+        var productId = $(this).data('id');
+        var quantity = 1;
+        $.ajax({
+            type: "POST",
+            url: "{% url 'shopping:add_to_cart' %}",
+            data: {
+                'product_id': productId,
+                'quantity': quantity,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response){
+                if(response.status == 'ok'){
+                    alert(response.message);
+                } else {
+                    alert("Xəta baş verdi.");
+                }
+            },
+            error: function(){
+                alert("Serverlə əlaqə qurulmadı.");
+            }
+        });
+    });
+
+    $('.add-to-wishlist').click(function(e){
+        e.preventDefault();
+        var productId = $(this).data('id');
+        var quantity = 1;
+        $.ajax({
+            type: "POST",
+            url: "{% url 'shopping:add_to_wishlist' %}",
+            data: {
+                'product_id': productId,
+                'quantity': quantity,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response){
+                if(response.status == 'ok'){
+                    alert(response.message);
+                } else {
+                    alert("Xəta baş verdi.");
+                }
+            },
+            error: function(){
+                alert("Serverlə əlaqə qurulmadı.");
+            }
+        });
+    });
+});
+</script>
+<!-- Add-to-cart end -->
+
+
+{%endblock%}

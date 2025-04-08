@@ -1,0 +1,18 @@
+{# __category.html #}
+<div class="sidebar-widget category">
+    <h2 class="title">Category</h2>
+
+    <ul>
+        <li>
+            <a href="?category=all" class="reset-category">All Products</a>
+        </li>
+        {% for category in categories %}
+            {% if category.is_active %}
+                <li>
+                    <a href="?category={{ category.id }}">{{ category.name }}</a>
+                    <span>({{ category.products.count }})</span>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>
