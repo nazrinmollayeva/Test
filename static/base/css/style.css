@@ -1745,3 +1745,13 @@ button.btn {
         text-align: center; 
     } 
 }
+
+/***************************/
+/****** my additions *******/
+/***************************/
+.top-header .dropdown-toggle {
+  color: #333 !important;
+}
+.top-header .dropdown-item {
+  color: #333 !important;
+}

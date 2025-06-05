@@ -22,6 +22,7 @@ class Products(models.Model):
     product_name = models.CharField(max_length=200)
     image = models.ImageField(upload_to='products/')
     ex_price = models.CharField(max_length=200, blank=True, null=True)
+    brand = models.CharField(max_length=200, blank=True, null=True)
     price = models.CharField(max_length=200)
     score = models.FloatField(default=0)
     details = models.TextField()

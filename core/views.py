@@ -17,8 +17,14 @@ from django.utils.html import strip_tags
 from django.core.mail import send_mail
 import os
 
+from django.db.models import Q
+
+from django.utils.translation import gettext as _
+
 
 def home_view(request):
+
+
     sliders = HomeSlider.objects.filter(is_active=True)
 
     featured_products = Products.objects.filter(ex_price__isnull=False).exclude(ex_price="")
@@ -68,23 +74,43 @@ def home_view(request):
         'subscriber_exists': subscriber_exists,
     })
 
-# def product_view(request):
-#     products_list = Products.objects.all()
-#     featured_products = Products.objects.filter(ex_price__isnull=False).exclude(ex_price="")
-#     brands = Brands.objects.all()
-#
-#     paginator = Paginator(products_list, 9)
-#     page_number = request.GET.get('page', 1)
-#     page_obj = paginator.get_page(page_number)
-#
-#     featured_product = random.choice(featured_products) if featured_products.exists() else None
-#
-#     return render(request, 'products.html', {
-#         'page_obj':page_obj,
-#         'featured_product': featured_product,
-#         'brands': brands,
-#         # 'page_obj': page_obj,
-#     })
+def search_view(request):
+    context = {}
+    key_data = request.GET.get('q', '')
+    if key_data:
+        products = Products.objects.filter(
+            Q(product_name__icontains=key_data) |
+            Q(details__icontains=key_data) |
+            Q(description__icontains=key_data) |
+            Q(specification__icontains=key_data)
+            )
+        paginator = Paginator(products, 9)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        context = {
+            'products': products,
+            'page_obj': page_obj,
+            'query': key_data
+        }
+
+    # category_id = request.GET.get('category')
+    #
+    # if category_id:
+    #     if category_id == "all":
+    #         products_list = Products.objects.all()
+    #     else:
+    #         products_list = Products.objects.filter(category__id=category_id)
+    # else:
+    #     products_list = Products.objects.all()
+    #
+    #
+    # paginator = Paginator(products_list, 9)
+    # page_number = request.GET.get('page', 1)
+    # page_obj = paginator.get_page(page_number)
+    # context['page_obj']= page_obj
+
+    return render(request, 'search.html', context)
 
 def product_view(request):
     category_id = request.GET.get('category')
@@ -97,13 +123,6 @@ def product_view(request):
     else:
         products_list = Products.objects.all()
 
-    # if category_id is None:
-    #     products_list = Products.objects.none()
-    # else:
-    #     if category_id == "all":
-    #         products_list = Products.objects.all()
-    #     else:
-    #         products_list = Products.objects.filter(category__id=category_id)
 
     paginator = Paginator(products_list, 9)
     page_number = request.GET.get('page', 1)
@@ -395,7 +414,3 @@ def move_to_cart(request):
 
 def checkout_view(request):
     return render(request, 'checkout.html')
-
-
-
-

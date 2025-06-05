@@ -2,6 +2,8 @@
 
 {% load static %}
 
+{% load static i18n %}
+
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -38,12 +40,16 @@
                             </a>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="search">
-                            <input type="text" placeholder="Search">
+                    <form class="col-md-6 search" method="GET" action="{% url 'shopping:search' %}">
+                            <input name="q" type="text" placeholder="Search">
                             <button><i class="fa fa-search"></i></button>
-                        </div>
-                    </div>
+                    </form>
+
+
+
+
+
+
                     <div class="col-md-3">
                         <div class="user">
                             <div class="dropdown">
@@ -73,29 +79,41 @@
         <div class="header">
             <div class="container">
                 <nav class="navbar navbar-expand-md bg-dark navbar-dark">
-                    <a href="#" class="navbar-brand">MENU</a>
+                    <a href="#" class="navbar-brand">{% trans 'MENU' %}</a>
                     <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
                         <span class="navbar-toggler-icon"></span>
                     </button>
 
                     <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
                         <div class="navbar-nav m-auto">
-                            <a href="{% url 'shopping:home' %}" class="nav-item nav-link {% if request.path == '/' %} active {% endif %}">Home</a>
-                            <a href="{% url 'shopping:products' %}" class="nav-item nav-link {% if 'products/' in request.path %} active {% endif %}">Products</a>
+                            <a href="{% url 'shopping:home' %}" class="nav-item nav-link {% if request.path == '/' %} active {% endif %}">{% trans 'Home' %}</a>
+                            <a href="{% url 'shopping:products' %}" class="nav-item nav-link {% if 'products/' in request.path %} active {% endif %}">{% trans 'Products' %}</a>
                             <div class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle {% if 'cart' in request.path or 'wishlist' in request.path or 'checkout' in request.path or 'login' in request.path or 'register' in request.path or 'my-account' in request.path or 'product' in request.path and not 'products/' in request.path %} active {% endif %}
- " data-toggle="dropdown">Pages</a>
+                                <a href="#" class="nav-link dropdown-toggle {% if 'cart' in request.path or 'wishlist' in request.path or 'checkout' in request.path or 'login' in request.path or 'register' in request.path or 'my-account' in request.path or 'product' in request.path and not 'products/' in request.path %} active {% endif %}" \
+                                   data-toggle="dropdown">{% trans 'Pages' %}</a>
                                 <div class="dropdown-menu">
-                                    <a href="product-list.html" class="dropdown-item">Product</a>
-                                    <a href="{% url 'shopping:cart' %}" class="dropdown-item">Cart</a>
-                                    <a href="{% url 'shopping:wishlist' %}" class="dropdown-item">Wishlist</a>
-                                    <a href="{% url 'shopping:checkout' %}" class="dropdown-item">Checkout</a>
-                                    <a href="{% url 'shopping:login' %}" class="dropdown-item">Login & Register</a>
-                                    <a href="{% url 'shopping:account' %}" class="dropdown-item">My Account</a>
+                                    <a href="product-list.html" class="dropdown-item">{% trans 'Product' %}</a>
+                                    <a href="{% url 'shopping:cart' %}" class="dropdown-item">{% trans 'Cart' %}</a>
+                                    <a href="{% url 'shopping:wishlist' %}" class="dropdown-item">{% trans 'Wishlist' %}</a>
+                                    <a href="{% url 'shopping:checkout' %}" class="dropdown-item">{% trans 'Checkout' %}</a>
+                                    <a href="{% url 'shopping:login' %}" class="dropdown-item">{% trans 'Login & Register' %}</a>
+                                    <a href="{% url 'shopping:account' %}" class="dropdown-item">{% trans 'My Account' %}</a>
                                 </div>
                             </div>
-                            <a href="{% url 'shopping:contact' %}" class="nav-item nav-link {% if 'contact/' in request.path %} active {% endif %}">Contact Us</a>
+                            <a href="{% url 'shopping:contact' %}" class="nav-item nav-link {% if 'contact/' in request.path %} active {% endif %}">{% trans 'Contact Us' %}</a>
                         </div>
+                        <form action="{% url 'set_language' %}" method="post" class="form-inline">
+                          {% csrf_token %}
+                          {% get_current_language as CURRENT_LANG %}
+                          {% get_available_languages as LANGUAGES %}
+                          <select name="language" onchange="this.form.submit()" class="form-control">
+                            {% for code, name in LANGUAGES %}
+                              <option value="{{ code }}" {% if code == CURRENT_LANG %}selected{% endif %}>{{ name }}</option>
+                            {% endfor %}
+                          </select>
+                          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                        </form>
+
                     </div>
                 </nav>
             </div>

@@ -3,13 +3,14 @@ from .views import home_view, product_view, product_detail_view,\
     contact_view, login_view, register_view, logout_view,account_view,\
     cart_view, add_to_cart, update_cart_item, remove_cart_item,\
      wishlist_view, add_to_wishlist, update_wishlist_item, remove_wishlist_item,\
-    move_to_cart, checkout_view
+    move_to_cart, checkout_view, search_view
 
 app_name = 'shopping'
 
 
 urlpatterns = [
     path('', home_view, name='home'),
+    path('search/', search_view, name='search'),
     path('products/', product_view, name='products'),
     path('product/<int:post_id>/', product_detail_view, name='product_detail'),
     path('contact/', contact_view, name='contact'),
